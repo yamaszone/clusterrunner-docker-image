@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# This script automates the workflow around packaging CR using Docker.
+
+# yamaszone should be replaced with official user
+DR_USR=yamaszone
+CR_BIN=$DR_USR/clusterrunner:binary
+CR_SRC=$DR_USR/clusterrunner:source
+
+help(){
+	echo "Usage:"
+	printf "\t bin\t: Run ClusterRunner from binary.\n"
+	printf "\t build\t: Build ClusterRunner Docker images.\n"
+	printf "\t help\t: Show this help.\n"
+	printf "\t push\t: Push ClusterRunner images to Docker Hub.\n"
+	printf "\t src\t: Run ClusterRunner from source.\n"
+	printf "\t tests\t: Run BATS tests to validate image builds.\n"
+	exit 0
+}
+
+build_images(){
+	# *-source.yml only overrides 'dockerfile:' flavor and corresponding 'image:' name
+	docker-compose -f docker-compose-binary.yml build
+	docker-compose -f docker-compose-binary.yml -f docker-compose-source.yml build
+}
+
+push_images(){
+	# Uses Docker Hub as default
+	docker push $CR_BIN
+	docker push $CR_SRC
+}
+
+configure_bats_assert(){
+	# Configure bats-assert library if not configured already
+	LIB_REPO=https://github.com/jasonkarns/bats-assert.git
+	LIB_DIR=tests/helpers/assertions
+	if [[ ! -d $LIB_DIR ]]; then
+		git clone -b v1.1.1 $LIB_REPO $LIB_DIR
+	fi
+}
+
+install_bats(){
+	# Install BATS framework if not installed already
+	type bats >/dev/null 2>&1
+	if [[ "$?" -ne "0" ]]; then
+		git clone -b v0.4.0 https://github.com/sstephenson/bats.git /tmp/bats
+		OS_NAME=$(uname -a)
+		echo $OS_NAME
+		if [[ $OS_NAME == *"coreos"* ]]; then
+			cd /tmp/bats && sudo ./install.sh /opt
+		else
+			cd /tmp/bats && sudo ./install.sh /usr/local
+		fi
+		cd -
+		rm -rf /tmp/bats
+	fi
+}
+
+if [[ -z $1 ]];then
+	help
+	exit 0
+fi
+# Inputs to pass on to CR via this script; exclude $1
+INPUTS=`echo "${@:2}"`
+
+case $1 in
+	bin)
+		docker run --rm $CR_BIN $INPUTS
+		;;
+	build)
+		build_images
+		;;
+	push)
+		push_images
+		;;
+	src)
+		docker run --rm $CR_SRC $INPUTS
+		;;
+	tests)
+		install_bats
+		configure_bats_assert
+		bats tests/
+		;;
+	* | help)
+		help
+		;;
+esac

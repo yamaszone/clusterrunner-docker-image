@@ -1,3 +1,8 @@
+*.swp
+
+# Exclude BATS assert library
+tests/helpers/assertions/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
