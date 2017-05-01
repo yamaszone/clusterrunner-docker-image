@@ -1,15 +1,5 @@
-## TODO for Dockerization
-* Add maintainer(s)
-  - Maintainer for CR Dockerfile needs to be added after pull request is merged. Ideally the maintainer should be someone from official team with appropriate Docker Hub permission to tag image as `box/clusterrunner:latest`. I can volunteer if needed but that will require collaborator permission for Docker Hub.
-* Lean Docker image (consider tiny base e.g. busybox, alpine, etc.)
-  - Currently `Dockerfile-source` uses `python:3.4-slim` as the base. I attempted `python:alpine` as the base but it didn't feel like worth the [trouble](https://github.com/docker/docker/issues/27940). My docker version is `1.12.6` but the problem might have been fixed in `1.13.0+`. I will revisit this in the future.
-* Reorganize directory structure (cleaner project root preferred)
-  - I was considering potential restructure of CR project root directory similar to [this](https://gist.github.com/yamaszone/6a4304069652a4a01ecdacdd4e7c7df1) so that:
-    - Only relevant project artifacts can be easily added into Docker image excluding non-PROD dependencies like tests, docs, Dockerfiles, docker-compose.yaml, and so on...
-    - Non-PROD tools/libs installation inside Docker container is excluded by splitting `requirements.txt` into `requirements-prod.txt` and `requirements-non-prod.txt` to deal with security/maintenance aspects of production dependencies as a priority basis
-    - Readability can be improved
-    - ... :)
-  - I will hold off on this as it will potentially require breaking changes. Also allowing more time to rethink this!
+# ClusterRunner Docker image
+[ClusterRunner](http://www.clusterrunner.com/) Docker container to run tests in parallel.
 
 ## User Guide
 #### Usage Scenarios
@@ -55,3 +45,16 @@ We use `docker-compose` to maintain two flavors of Docker images: `docker-compos
   - Run `./run-cr push` to push ClusterRunner images to Docker Hub
 * Image Versions
   - Currently [ClusterRunner images](https://hub.docker.com/r/yamaszone/clusterrunner/tags/) are tagged as `binary` and `source`. To improve maintainability of these images, we will concatenate ClusterRunner versions with the container tags in the future.
+
+## TODO for Dockerization
+* Add maintainer(s)
+  - Maintainer for CR Dockerfile needs to be added after pull request is merged. Ideally the maintainer should be someone from official team with appropriate Docker Hub permission to tag image as `box/clusterrunner:latest`. I can volunteer if needed but that will require collaborator permission for Docker Hub.
+* Lean Docker image (consider tiny base e.g. busybox, alpine, etc.)
+  - Currently `Dockerfile-source` uses `python:3.4-slim` as the base. I attempted `python:alpine` as the base but it didn't feel like worth the [trouble](https://github.com/docker/docker/issues/27940). My docker version is `1.12.6` but the problem might have been fixed in `1.13.0+`. I will revisit this in the future.
+* Reorganize directory structure (cleaner project root preferred)
+  - I was considering potential restructure of CR project root directory similar to [this](https://gist.github.com/yamaszone/6a4304069652a4a01ecdacdd4e7c7df1) so that:
+    - Only relevant project artifacts can be easily added into Docker image excluding non-PROD dependencies like tests, docs, Dockerfiles, docker-compose.yaml, and so on...
+    - Non-PROD tools/libs installation inside Docker container is excluded by splitting `requirements.txt` into `requirements-prod.txt` and `requirements-non-prod.txt` to deal with security/maintenance aspects of production dependencies as a priority basis
+    - Readability can be improved
+    - ... :)
+  - I will hold off on this as it will potentially require breaking changes. Also allowing more time to rethink this!
