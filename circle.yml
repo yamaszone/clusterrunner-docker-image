@@ -1,0 +1,19 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [ -e ~/docker/image_source.tar ]; then docker load --input ~/docker/image_source.tar; fi
+    - docker build -t yamaszone/clusterrunner:source -f Dockerfile-source .
+    - mkdir -p ~/docker; docker save yamaszone/clusterrunner:source > ~/docker/image_source.tar
+    - if [ -e ~/docker/image_binary.tar ]; then docker load --input ~/docker/image_binary.tar; fi
+    - docker build -t yamaszone/clusterrunner:binary -f Dockerfile-binary .
+    - mkdir -p ~/docker; docker save yamaszone/clusterrunner:binary > ~/docker/image_binary.tar
+
+test:
+  override:
+    - bats tests/
