@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/yamaszone/clusterrunner-docker-image/tree/develop.svg?style=svg)](https://circleci.com/gh/yamaszone/clusterrunner-docker-image/tree/develop)
+
 # ClusterRunner Docker image
 [ClusterRunner](http://www.clusterrunner.com/) Docker container to run tests in parallel.
 
